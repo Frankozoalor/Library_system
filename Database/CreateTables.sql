@@ -1,0 +1,36 @@
+USE library_database;
+
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS borrowed_books;
+
+CREATE TABLE users (
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('user', 'admin') NOT NULL
+);
+
+CREATE TABLE books (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    genre VARCHAR(100),
+    isbn VARCHAR(20),
+    quantity INT(100),
+    status ENUM('available', 'borrowed') DEFAULT 'available',
+    added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE borrowed_books (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    book_id INT(11) NOT NULL,
+    user_id INT(10) UNSIGNED NOT NULL,
+    borrow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    return_date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL 14 DAY),
+    penalty DECIMAL(10, 2) DEFAULT 0.00,
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
